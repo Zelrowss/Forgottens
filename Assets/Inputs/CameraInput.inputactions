@@ -1,0 +1,40 @@
+{
+    "name": "CameraInput",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "fb90ec62-448c-4f5d-99d5-cdd23cafcdc1",
+            "actions": [
+                {
+                    "name": "Look",
+                    "type": "Value",
+                    "id": "83815fce-1e5d-4571-b574-325ae7354ca0",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "90930489-6d9a-4749-b9e0-7164be8435b1",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Keyboard",
+            "bindingGroup": "Keyboard",
+            "devices": []
+        }
+    ]
+}

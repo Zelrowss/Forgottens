@@ -27,6 +27,7 @@ public class Enemy : MonoBehaviour
     public List<ProcElement> currentProcs = new List<ProcElement>();
     public bool cantMove;
     public bool isConfused;
+    public float test;
 
     [Header("Value (bis)")]
     private float lastDecrementTime;

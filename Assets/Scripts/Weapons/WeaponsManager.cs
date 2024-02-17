@@ -170,10 +170,11 @@ public class WeaponsManager : MonoBehaviour
 
             GameObject hitObject = hit.transform.gameObject;          
 
-            if (hitObject.CompareTag("Enemy")){
+            if (hitObject.CompareTag("Enemy") || hitObject.CompareTag("DestroyableObject")){
                 MakeDamage(hitObject);
             }
             else{
+                if (hitObject.CompareTag("Unmovable")) {return;}
                 Rigidbody rbObject = hitObject.GetComponent<Rigidbody>();
 
                 if (rbObject != null) rbObject.AddForce(-hit.normal * 5, ForceMode.Impulse);
@@ -276,14 +277,26 @@ public class WeaponsManager : MonoBehaviour
                 if (criticalMultiplier != 0) finalDamage = healthDamage * criticalMultiplier * (currentElement == enemyComponent.weakness ? 2 : 1);
                 else finalDamage = healthDamage * (currentElement == enemyComponent.weakness ? 2 : 1);
 
-                enemyComponent.health -= healthDamage;
+                enemyComponent.health -= finalDamage;
                 DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier);
             }
             else{   
                 if (criticalMultiplier != 0) finalDamage = shieldDamage * criticalMultiplier * (currentElement == enemyComponent.weakness ? 2 : 1);
                 else finalDamage = shieldDamage * (currentElement == enemyComponent.weakness ? 2 : 1);
 
-                enemyComponent.shield -= shieldDamage;
+                enemyComponent.shield -= finalDamage;
+                DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier);
+            }
+        }
+        else if(enemy.CompareTag("DestroyableObject")) {
+            Vector3 popupPos = hit.point + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+            Quaternion popupRot = Quaternion.LookRotation(-hit.normal);
+            DestroyableObjects destroyableObject = enemy.GetComponent<DestroyableObjects>();
+
+            if (destroyableObject.health > 0) {
+                finalDamage = criticalMultiplier > 0 ? healthDamage * criticalMultiplier : healthDamage;
+
+                destroyableObject.health -= finalDamage;
                 DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier);
             }
         }

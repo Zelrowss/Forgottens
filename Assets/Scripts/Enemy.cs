@@ -19,6 +19,7 @@ public class Enemy : MonoBehaviour
     public float sprintSpeed;
 
     [Header("Value")]
+    public Vector3 headPos;
     public float maxHealth;
     public float maxShield;
     public float health;
@@ -27,7 +28,6 @@ public class Enemy : MonoBehaviour
     public List<ProcElement> currentProcs = new List<ProcElement>();
     public bool cantMove;
     public bool isConfused;
-    public float test;
 
     [Header("Value (bis)")]
     private float lastDecrementTime;
@@ -57,6 +57,23 @@ public class Enemy : MonoBehaviour
         if (_weaponManager == null) _weaponManager = GameObject.FindObjectOfType<WeaponsManager>();
 
         if (health <= 0 && shield <= 0){
+            GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>().RemoveMarkerByEnemy(gameObject);
+
+            MissionController _missionController = GameObject.FindGameObjectWithTag("Mission Manager").GetComponent<MissionController>();
+
+            switch(_missionController.currentMissionType){
+                case MissionType.Capture:
+                    _missionController.isFinish = true;
+                    break;
+                case MissionType.Extermination:
+                    _missionController.enemyKilledAmount += 1;
+                    _missionController.lastEnemyKillTime = Time.time;
+
+                    if (_missionController.help) _missionController.help = false;
+
+                    break;
+            }
+
             Destroy(gameObject);
         }
         

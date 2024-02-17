@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - Unmovable
+  - Mission Manager
+  - DestroyableObject
   layers:
   - Default
   - TransparentFX

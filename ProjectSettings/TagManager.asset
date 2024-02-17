@@ -8,6 +8,7 @@ TagManager:
   - Unmovable
   - Mission Manager
   - DestroyableObject
+  - SabotageObjectif
   layers:
   - Default
   - TransparentFX

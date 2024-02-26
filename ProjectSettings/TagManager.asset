@@ -9,6 +9,11 @@ TagManager:
   - Mission Manager
   - DestroyableObject
   - SabotageObjectif
+  - HealthBall
+  - EnergyBall
+  - Ammo1
+  - Ammo2
+  - Ammo3
   layers:
   - Default
   - TransparentFX

@@ -37,7 +37,10 @@ public class PlayerManager : MonoBehaviour
     [Header("Player")]
     public bool isInMission = false;
     [HideInInspector] public bool weaponChanging;
-    public float health, shield, energy, ammunition;
+    public float maxHealth, maxShield, maxEnergy;
+    public float health, shield, energy;
+    public float maxFirstMunition, maxSecondMunition, maxThirdMunition;
+    public float firstMunition, secondMunition, thirdMunition;
     public List<MarkerInfo> markers;
     
     [Header("Weapons")]
@@ -207,6 +210,13 @@ public class PlayerManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        health = maxHealth;
+        shield = maxShield;
+        firstMunition = maxFirstMunition;
+        secondMunition = maxSecondMunition;
+        thirdMunition = maxThirdMunition;
+
         markers = new List<MarkerInfo>();
         MissionController missionManager = GameObject.FindGameObjectWithTag("Mission Manager").GetComponent<MissionController>();
 

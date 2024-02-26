@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcd6052c2f2960742adaa615359b90f0, type: 3}
+  m_Name: Muntion1
+  m_EditorClassIdentifier: 
+  model: {fileID: 2302745980766281366, guid: 6d3016094881c7346a6230396f3d8fdc, type: 3}
+  value: 0

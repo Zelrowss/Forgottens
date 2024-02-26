@@ -143,7 +143,7 @@ public class PlayerManager : MonoBehaviour
 
             if (marker.enemy != null)
             {
-                if (distance < 1000 || !marker.enemy.activeSelf) return;
+                if (distance > 1000 || !marker.enemy.activeSelf) return;
 
                 Vector3 enemyWorldPosition = marker.enemy.transform.position + marker.enemy.GetComponent<Enemy>().headPos;
 

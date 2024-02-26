@@ -166,9 +166,9 @@ public class WeaponsManager : MonoBehaviour
             hitEffect.transform.forward = hit.normal;
             hitEffect.Emit(1);
 
-            GameObject hitObject = hit.transform.gameObject;          
+            GameObject hitObject = hit.transform.gameObject;       
 
-            if (hitObject.CompareTag("Enemy") || hitObject.CompareTag("DestroyableObject")){
+            if (hitObject.CompareTag("Enemy") || hitObject.CompareTag("DestroyableObject") || hitObject.CompareTag("SabotageObjectif")){
                 MakeDamage(hitObject);
             }
             else{
@@ -286,7 +286,7 @@ public class WeaponsManager : MonoBehaviour
                 DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier);
             }
         }
-        else if(enemy.CompareTag("DestroyableObject")) {
+        else if(enemy.CompareTag("DestroyableObject") || enemy.CompareTag("SabotageObjectif")) {
             Vector3 popupPos = hit.point + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
             Quaternion popupRot = Quaternion.LookRotation(-hit.normal);
             DestroyableObjects destroyableObject = enemy.GetComponent<DestroyableObjects>();

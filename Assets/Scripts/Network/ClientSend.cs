@@ -62,5 +62,19 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+
+    public static void SendDataFlashToRoom(/*GameRoom room,*/ string _pktName, string _contentJSON)
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.clientSendFlashInfo))
+        {
+            _packet.Write(_pktName);
+            _packet.Write(_contentJSON);
+
+
+            SendUDPData(_packet);
+        }
+    }
+
+
     #endregion
 }

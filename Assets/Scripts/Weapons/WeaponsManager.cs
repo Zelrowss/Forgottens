@@ -69,7 +69,6 @@ public class WeaponsManager : MonoBehaviour
     public WeaponsType currentWeaponType;
     public Element currentElement;
     public Transform raycastOrigin;
-    public Transform raycastDestination;
     [HideInInspector] public RaycastHit hit;
     private List<Bullet> bullets = new List<Bullet>();
 
@@ -120,7 +119,6 @@ public class WeaponsManager : MonoBehaviour
     }
 
     void Start(){
-        raycastDestination = _weaponHolder.raycastDest.transform;
         hitEffect = _weaponHolder.GetComponentInChildren<ParticleSystem>();
     }
 
@@ -323,7 +321,14 @@ public class WeaponsManager : MonoBehaviour
 
         UpdateBullet(Time.deltaTime);
            
-        if (_playerController.isAttacking){  
+        if (_playerController.isAttacking){
+
+            Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
+            Ray ray = Camera.main.ScreenPointToRay(screenCenter);
+
+            RaycastHit hit;
+
+            
 
             if (criticalChance <= 100){
                 if (Random.Range(0, 101) < criticalChance){
@@ -382,14 +387,17 @@ public class WeaponsManager : MonoBehaviour
 
             if (currentWeaponType == WeaponsType.Automatic){
                 if (Time.time - lastTimeAttack >= 1f / fireRate){
-                    
-                    Vector3 velocity = (raycastDestination.position - raycastOrigin.position).normalized * bulletSpeed;
-                    var bullet = CreateBullet(raycastOrigin.position, velocity);
-                    bullets.Add(bullet);
 
-                    muzzleFlash.Emit(1);
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        Vector3 velocity = (hit.point - raycastOrigin.position).normalized * bulletSpeed;
+                        var bullet = CreateBullet(raycastOrigin.position, velocity);
+                        bullets.Add(bullet);
 
-                    lastTimeAttack = Time.time;
+                        muzzleFlash.Emit(1);
+
+                        lastTimeAttack = Time.time;
+                    }
                 }
             }
             else if (currentWeaponType == WeaponsType.Burst){
@@ -399,28 +407,40 @@ public class WeaponsManager : MonoBehaviour
                             bulletsShotInBurst = bulletPerBurst;
                         }
 
-                        Vector3 velocity = (raycastDestination.position - raycastOrigin.position).normalized * bulletSpeed;
-                        var bullet = CreateBullet(raycastOrigin.position, velocity);
-                        bullets.Add(bullet);
+                        if (Physics.Raycast(ray, out hit))
+                        {
+                            Vector3 velocity = (hit.point - raycastOrigin.position).normalized * bulletSpeed;
+                            var bullet = CreateBullet(raycastOrigin.position, velocity);
+                            bullets.Add(bullet);
 
-                        muzzleFlash.Emit(1);
+                            muzzleFlash.Emit(1);
 
-                        lastTimeShot = Time.time;
-                        bulletsShotInBurst--;
+                            lastTimeShot = Time.time;
+                            bulletsShotInBurst--;
 
-                        if (bulletsShotInBurst == 0){
-                            lastTimeBurstShot = Time.time;
+                            if (bulletsShotInBurst == 0)
+                            {
+                                lastTimeBurstShot = Time.time;
+                            }
                         }
+
+                        
                     }
                 }
             }
             else if (currentWeaponType == WeaponsType.ShotGun){
                 if (Time.time - lastTimeAttack >= 1f / fireRate && !hasShoot){
                     for (int i = 0; i < shotgunBulletCount; i++){
-                        Vector3 spreadDirection = GetSreadDirection(raycastDestination.position - raycastOrigin.position, shotgunSpreadAngle);
-                        Vector3 velocity = spreadDirection.normalized * bulletSpeed;
-                        var bullet = CreateBullet(raycastOrigin.position, velocity);
-                        bullets.Add(bullet);
+
+
+                        if (Physics.Raycast(ray, out hit))
+                        {
+                            Vector3 spreadDirection = GetSreadDirection(hit.point - raycastOrigin.position, shotgunSpreadAngle);
+                            Vector3 velocity = spreadDirection.normalized * bulletSpeed;
+                            var bullet = CreateBullet(raycastOrigin.position, velocity);
+                            bullets.Add(bullet);
+                        }
+                            
                     }
 
                     hasShoot = true;
@@ -433,30 +453,37 @@ public class WeaponsManager : MonoBehaviour
             else if (currentWeaponType == WeaponsType.Sniper){
                 if (Time.time - lastTimeAttack >= 1f && !hasShoot){
 
-                    Vector3 velocity = (raycastDestination.position - raycastOrigin.position).normalized * bulletSpeed;
-                    var bullet = CreateBullet(raycastOrigin.position, velocity);
-                    bullets.Add(bullet);
 
-                    muzzleFlash.Emit(1);
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        Vector3 velocity = (hit.point - raycastOrigin.position).normalized * bulletSpeed;
+                        var bullet = CreateBullet(raycastOrigin.position, velocity);
+                        bullets.Add(bullet);
 
-                    hasShoot = true;
+                        muzzleFlash.Emit(1);
 
-                    lastTimeAttack = Time.time;
+                        hasShoot = true;
+
+                        lastTimeAttack = Time.time;
+                    }
 
                 }
             }
             else if (currentWeaponType == WeaponsType.FlameThrower){
                 if (Time.time - lastTimeAttack >= 1f / fireRate){
 
-                    if (Physics.Raycast(raycastOrigin.position, raycastDestination.position - raycastOrigin.position, out hit, maxLifeTime * 2)){
-                        MakeDamage(hit.transform.gameObject);
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        if (Physics.Raycast(raycastOrigin.position, hit.point - raycastOrigin.position, out hit, maxLifeTime * 2))
+                        {
+                            MakeDamage(hit.transform.gameObject);
+                        }
+
+                        flameThrowerParticle.startLifetime = maxLifeTime / 4;
+                        flameThrowerParticle.Emit(1);
+
+                        lastTimeAttack = Time.time;
                     }
-
-                    flameThrowerParticle.startLifetime = maxLifeTime / 4;
-                    flameThrowerParticle.Emit(1);
-
-                    lastTimeAttack = Time.time;
-
                 }
             }
             else if (currentWeaponType == WeaponsType.Laser){
@@ -466,12 +493,16 @@ public class WeaponsManager : MonoBehaviour
                         spawnedLaser = Instantiate(laserTracer, raycastOrigin.position, Quaternion.identity);
                     }
 
-                    if (Physics.Raycast(raycastOrigin.position, raycastDestination.position - raycastOrigin.position, out hit, 999)){
-                        MakeDamage(hit.transform.gameObject);
-                    }
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        if (Physics.Raycast(raycastOrigin.position, hit.point - raycastOrigin.position, out hit, 999))
+                        {
+                            MakeDamage(hit.transform.gameObject);
+                        }
 
-                    spawnedLaser.SetPosition(0, raycastOrigin.position);
-                    spawnedLaser.SetPosition(1, raycastDestination.position);
+                        spawnedLaser.SetPosition(0, raycastOrigin.position);
+                        spawnedLaser.SetPosition(1, hit.point);
+                    }
                 }
                 else{
                     if (spawnedLaser!= null) Destroy(spawnedLaser);

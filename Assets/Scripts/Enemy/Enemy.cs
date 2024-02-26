@@ -10,6 +10,12 @@ public class ProcElement{
     public float lastProcTime;
 }
 
+[System.Serializable]
+public class Loots {
+    public LootManager scriptableObject;
+    public float dropChance;
+}
+
 public class Enemy : MonoBehaviour
 {
     [Header("Speed")]
@@ -26,6 +32,7 @@ public class Enemy : MonoBehaviour
     public float shield;
     public Element weakness;
     public List<ProcElement> currentProcs = new List<ProcElement>();
+    public List<Loots> loots = new List<Loots>();
     public bool cantMove;
     public bool isConfused;
 
@@ -75,6 +82,27 @@ public class Enemy : MonoBehaviour
             }
 
             Destroy(gameObject);
+            
+            float randomValue = Random.value;
+
+            float totalDropChance = 0f;
+            foreach (Loots loot in loots)
+            {
+                totalDropChance += loot.dropChance;
+            }
+            
+            float cumulativeChance = 0f;
+            foreach (Loots loot in loots)
+            {
+                cumulativeChance += loot.dropChance / totalDropChance;
+                if (randomValue <= cumulativeChance)
+                {
+                    GameObject lootItem = Instantiate(loot.scriptableObject.model);
+                    lootItem.transform.localPosition = transform.position;
+                    lootItem.transform.rotation = Quaternion.identity;
+                    break;
+                }
+            }
         }
         
         healthBar.fillAmount = health / maxHealth;

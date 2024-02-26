@@ -24,6 +24,9 @@ public enum EnemyFaction {
 
 public class MissionController : MonoBehaviour 
 {
+    public static MissionController instance;
+
+
     [Header("References")]
     public GameObject player;
 
@@ -75,6 +78,10 @@ public class MissionController : MonoBehaviour
         {
             Debug.LogWarning("Aucun ennemi valide trouvé pour la capture.");
         }
+    }
+    private void Awake()
+    {
+        if(instance == null) instance = this;
     }
 
     private void Start() 

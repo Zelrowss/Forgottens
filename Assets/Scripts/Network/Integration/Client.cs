@@ -287,6 +287,7 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.serverSendJsonToClient, ClientHandle.ServerSendJsonToClient },
             { (int)ServerPackets.returnHostJsonToClient, ClientHandle.ReturnHostJsonToClient },
             { (int)ServerPackets.returnClientJsonToHost, ClientHandle.ReturnClientJsonToHost },
+            { (int)ServerPackets.serverSendFlashInfo, ClientHandle.ReceiveFlashInfo }
         };
         Debug.Log("Initialized packets.");
     }

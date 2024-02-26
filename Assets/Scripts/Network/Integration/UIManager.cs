@@ -15,6 +15,8 @@ public class UIManager : MonoBehaviour
 
     public GameObject startMenu;
     public TMP_InputField usernameField;
+    public TMP_InputField adress;
+    public TMP_InputField port;
 
 
     private void Awake()
@@ -25,6 +27,9 @@ public class UIManager : MonoBehaviour
 
     public void ConnectToServer()
     {
+        Client.instance.ip = adress.text;
+        Client.instance.port = int.Parse(port.text);
+
         startMenu.SetActive(false);
         usernameField.interactable = false;
         Client.instance.ConnectToServer();

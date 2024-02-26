@@ -12,7 +12,8 @@ public enum ServerPackets
     playerDisconnected,
     serverSendJsonToClient,
     returnClientJsonToHost,
-    returnHostJsonToClient
+    returnHostJsonToClient,
+    serverSendFlashInfo
 }
 
 // Client > Server
@@ -21,7 +22,8 @@ public enum ClientPackets
     welcomeReceived = 1,
     sendJsonToServer,
     sendJsonToHost,
-    sendJsonToClients
+    sendJsonToClients,
+    clientSendFlashInfo
 }
 
 public class Packet : IDisposable

@@ -91,7 +91,11 @@ public class PlayerController : MonoBehaviour
     public bool wallLeft;
     public bool wallRight;
     private bool canWallRun = false;
-    
+
+
+    Vector3 rayOrigin;
+    Ray ray;
+    RaycastHit hit;
 
     private void Awake(){
         controller = GetComponent<CharacterController>();
@@ -341,9 +345,17 @@ public class PlayerController : MonoBehaviour
         }
 
         if (isAiming || isAttacking){
-            Vector3 worldAimTarget = aimLookAt.transform.position;
-            worldAimTarget.y = _armature.transform.position.y;
-            targetRotation = Quaternion.LookRotation(worldAimTarget - _armature.transform.position);
+
+            Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
+            ray = Camera.main.ScreenPointToRay(screenCenter);
+
+            if (Physics.Raycast(ray, out hit))
+            {
+
+                Vector3 worldAimTarget = hit.point;
+                worldAimTarget.y = _armature.transform.position.y;
+                targetRotation = Quaternion.LookRotation(worldAimTarget - _armature.transform.position);
+            }
         }
         else{
             Vector3 direction = (cameraHolder.transform.forward * movementInput.y + cameraHolder.transform.right * movementInput.x).normalized;

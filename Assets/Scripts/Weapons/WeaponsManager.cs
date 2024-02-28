@@ -83,6 +83,9 @@ public class WeaponsManager : MonoBehaviour
     public float bulletDrop = 0.0f;
     public float maxLifeTime = 3.0f;
     public float fireRate = 10;
+    public int maxAmmoPerClip = 100;
+    public int currentAmmoInClip;
+    public int totalAmmo;
 
     [Header("Value (bis)")]
     private float criticalMultiplier;
@@ -96,7 +99,7 @@ public class WeaponsManager : MonoBehaviour
 
     [Header("Burst Values")]
     public float burstCooldown = 1.0f;
-    public float bulletPerBurst = 3;
+    public int bulletPerBurst = 3;
     public float timeBetweenBullets = 0.1f;
     private float bulletsShotInBurst;
     private float lastTimeShot;
@@ -111,15 +114,16 @@ public class WeaponsManager : MonoBehaviour
     private float laserCurrentTime;
     public float laserMaxTime;
 
-    
-    void Awake(){
-        _playerController = GetComponentInParent<PlayerController>();
-        _weaponHolder = GetComponentInParent<WeaponHolder>();
-        muzzleFlash = GetComponentInChildren<ParticleSystem>();
+    IEnumerator ResetElentaryDamage(){
+        if (isElementaryShot){
+            yield return new WaitForSeconds(0.1f);
+            isElementaryShot = false;
+        }
     }
 
-    void Start(){
-        hitEffect = _weaponHolder.GetComponentInChildren<ParticleSystem>();
+    IEnumerator WaitForShootAgain(){
+        yield return new WaitForSeconds(1f);
+        laserCurrentTime = 0;
     }
 
     Vector3 GetPosition(Bullet bullet){
@@ -168,7 +172,7 @@ public class WeaponsManager : MonoBehaviour
 
             GameObject hitObject = hit.transform.gameObject;       
 
-            if (hitObject.CompareTag("Enemy") || hitObject.CompareTag("DestroyableObject") || hitObject.CompareTag("SabotageObjectif")){
+            if (hitObject.CompareTag("Enemy") || hitObject.CompareTag("DestroyableObject") || hitObject.CompareTag("SabotageObjectif") || hitObject.CompareTag("Aurorium") || hitObject.CompareTag("Iridium") || hitObject.CompareTag("Biollumina") || hitObject.CompareTag("Aurique") || hitObject.CompareTag("Adamantite") || hitObject.CompareTag("Prismatite") || hitObject.CompareTag("Ether") || hitObject.CompareTag("Arcanite") || hitObject.CompareTag("Xénium") || hitObject.CompareTag("Sélénium")){
                 MakeDamage(hitObject);
             }
             else{
@@ -188,6 +192,20 @@ public class WeaponsManager : MonoBehaviour
             if (bullet.tracer != null) bullet.tracer.transform.position = end;
         }
         
+    }
+
+    public void Reload(){
+        int ammoNeeded = maxAmmoPerClip - currentAmmoInClip;
+
+        if (totalAmmo >= ammoNeeded) {
+            totalAmmo -= ammoNeeded;
+            currentAmmoInClip = maxAmmoPerClip;
+        }
+        else{
+            currentAmmoInClip += totalAmmo;
+
+            totalAmmo = 0;
+        }
     }
 
     private void MakeDamage(GameObject enemy){
@@ -276,14 +294,14 @@ public class WeaponsManager : MonoBehaviour
                 else finalDamage = healthDamage * (currentElement == enemyComponent.weakness ? 2 : 1);
 
                 enemyComponent.health -= finalDamage;
-                DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier);
+                DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier, GetComponentInParent<PlayerManager>().playerCanvas);
             }
             else{   
                 if (criticalMultiplier != 0) finalDamage = shieldDamage * criticalMultiplier * (currentElement == enemyComponent.weakness ? 2 : 1);
                 else finalDamage = shieldDamage * (currentElement == enemyComponent.weakness ? 2 : 1);
 
                 enemyComponent.shield -= finalDamage;
-                DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier);
+                DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier, GetComponentInParent<PlayerManager>().playerCanvas);
             }
         }
         else if(enemy.CompareTag("DestroyableObject") || enemy.CompareTag("SabotageObjectif")) {
@@ -295,16 +313,52 @@ public class WeaponsManager : MonoBehaviour
                 finalDamage = criticalMultiplier > 0 ? healthDamage * criticalMultiplier : healthDamage;
 
                 destroyableObject.health -= finalDamage;
-                DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier);
+                DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier, GetComponentInParent<PlayerManager>().playerCanvas);
             }
+        }
+        else if(enemy.CompareTag("Aurorium") || enemy.CompareTag("Iridium") || enemy.CompareTag("Biollumina") || enemy.CompareTag("Aurique") || enemy.CompareTag("Adamantite") || enemy.CompareTag("Prismatite") || enemy.CompareTag("Ether") || enemy.CompareTag("Arcanite") || enemy.CompareTag("Xénium") || enemy.CompareTag("Sélénium")) {
+            Vector3 popupPos = hit.point + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+            Quaternion popupRot = Quaternion.LookRotation(-hit.normal);
+            DestroyableObjects destroyableObject = enemy.GetComponent<DestroyableObjects>();
+            
+            finalDamage = criticalMultiplier > 0 ? healthDamage * criticalMultiplier : healthDamage;
+            DamagePopup.Create(damagePopupGO, popupPos, popupRot, finalDamage, criticalMultiplier, GetComponentInParent<PlayerManager>().playerCanvas);
+
+            MeshDestroy meshDestroy = enemy.GetComponent<MeshDestroy>();
+            if (meshDestroy == null) return;
+
+            int resourceAmount = Random.Range(0, 5);
+
+            meshDestroy.CutCascades = resourceAmount;
+            enemy.GetComponent<MeshDestroy>().DestroyMesh();
         }
 
     }
 
-    IEnumerator ResetElentaryDamage(){
-        if (isElementaryShot){
-            yield return new WaitForSeconds(0.1f);
-            isElementaryShot = false;
+    private Vector3 GetSreadDirection(Vector3 direction, float angle){
+        Vector3 spreadDirection = Quaternion.Euler(Random.Range(-angle, angle), Random.Range(-angle, angle), 0) * direction;
+        return spreadDirection;
+    }
+
+    void Awake(){
+        _playerController = GetComponentInParent<PlayerController>();
+        _weaponHolder = GetComponentInParent<WeaponHolder>();
+        muzzleFlash = GetComponentInChildren<ParticleSystem>();
+    }
+
+    void Start(){
+        hitEffect = _weaponHolder.GetComponentInChildren<ParticleSystem>();
+
+        currentAmmoInClip = maxAmmoPerClip;
+
+        PlayerManager playerManager = GetComponentInParent<PlayerManager>();
+        switch (playerManager.currentWeaponsPlace){
+            case Weapons.Primary:
+                totalAmmo = playerManager.maxFirstMunition;
+                break;
+            case Weapons.Secondary:
+                totalAmmo = playerManager.maxFirstMunition;
+                break;
         }
     }
 
@@ -312,7 +366,6 @@ public class WeaponsManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        StartCoroutine(ResetElentaryDamage());
 
         if (_playerController.isAiming && _weaponHolder.currentWeaponPos != null || _playerController.isAttacking && _weaponHolder.currentWeaponPos != null){
             Vector3 targetRotation = new Vector3(_playerController.cameraHolder.transform.rotation.eulerAngles.x, transform.rotation.y, _weaponHolder.currentWeaponPos.transform.rotation.z);
@@ -322,13 +375,10 @@ public class WeaponsManager : MonoBehaviour
         UpdateBullet(Time.deltaTime);
            
         if (_playerController.isAttacking){
-
             Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
             Ray ray = Camera.main.ScreenPointToRay(screenCenter);
 
             RaycastHit hit;
-
-            
 
             if (criticalChance <= 100){
                 if (Random.Range(0, 101) < criticalChance){
@@ -383,10 +433,12 @@ public class WeaponsManager : MonoBehaviour
                     isElementaryShot = true;
                 }
             }
-
+            
+            if (currentAmmoInClip <= 0) return;
 
             if (currentWeaponType == WeaponsType.Automatic){
                 if (Time.time - lastTimeAttack >= 1f / fireRate){
+                    currentAmmoInClip--;
 
                     if (Physics.Raycast(ray, out hit))
                     {
@@ -403,27 +455,31 @@ public class WeaponsManager : MonoBehaviour
             else if (currentWeaponType == WeaponsType.Burst){
                 if (Time.time >= lastTimeBurstShot + burstCooldown){
                     if (bulletsShotInBurst == 0 || Time.time - lastTimeShot >= timeBetweenBullets){
+
                         if (bulletsShotInBurst == 0){
                             bulletsShotInBurst = bulletPerBurst;
                         }
 
-                        if (Physics.Raycast(ray, out hit))
-                        {
-                            Vector3 velocity = (hit.point - raycastOrigin.position).normalized * bulletSpeed;
-                            var bullet = CreateBullet(raycastOrigin.position, velocity);
-                            bullets.Add(bullet);
+                        currentAmmoInClip -= bulletPerBurst;
 
-                            muzzleFlash.Emit(1);
-
-                            lastTimeShot = Time.time;
-                            bulletsShotInBurst--;
-
-                            if (bulletsShotInBurst == 0)
+                        for (int i = 0; i < bulletsShotInBurst; i++){
+                            if (Physics.Raycast(ray, out hit))
                             {
-                                lastTimeBurstShot = Time.time;
+                                Vector3 velocity = (hit.point - raycastOrigin.position).normalized * bulletSpeed;
+                                var bullet = CreateBullet(raycastOrigin.position, velocity);
+                                bullets.Add(bullet);
+
+                                muzzleFlash.Emit(1);
+
+                                lastTimeShot = Time.time;
+                                bulletsShotInBurst--;
+
+                                if (bulletsShotInBurst == 0)
+                                {
+                                    lastTimeBurstShot = Time.time;
+                                }
                             }
                         }
-
                         
                     }
                 }
@@ -443,6 +499,8 @@ public class WeaponsManager : MonoBehaviour
                             
                     }
 
+                    currentAmmoInClip -= shotgunBulletCount;
+
                     hasShoot = true;
 
                     muzzleFlash.Emit(1);
@@ -453,7 +511,7 @@ public class WeaponsManager : MonoBehaviour
             else if (currentWeaponType == WeaponsType.Sniper){
                 if (Time.time - lastTimeAttack >= 1f && !hasShoot){
 
-
+                    currentAmmoInClip--;
                     if (Physics.Raycast(ray, out hit))
                     {
                         Vector3 velocity = (hit.point - raycastOrigin.position).normalized * bulletSpeed;
@@ -479,6 +537,8 @@ public class WeaponsManager : MonoBehaviour
                             MakeDamage(hit.transform.gameObject);
                         }
 
+                        currentAmmoInClip --;
+
                         flameThrowerParticle.startLifetime = maxLifeTime / 4;
                         flameThrowerParticle.Emit(1);
 
@@ -492,6 +552,8 @@ public class WeaponsManager : MonoBehaviour
                     if (spawnedLaser == null){
                         spawnedLaser = Instantiate(laserTracer, raycastOrigin.position, Quaternion.identity);
                     }
+
+                    currentAmmoInClip --;
 
                     if (Physics.Raycast(ray, out hit))
                     {
@@ -518,16 +580,8 @@ public class WeaponsManager : MonoBehaviour
             if (spawnedLaser!= null) Destroy(spawnedLaser);
         }
 
-    }
+        StartCoroutine(ResetElentaryDamage());
 
-    IEnumerator WaitForShootAgain(){
-        yield return new WaitForSeconds(1f);
-        laserCurrentTime = 0;
-    }
-
-    private Vector3 GetSreadDirection(Vector3 direction, float angle){
-        Vector3 spreadDirection = Quaternion.Euler(Random.Range(-angle, angle), Random.Range(-angle, angle), 0) * direction;
-        return spreadDirection;
     }
 
 }

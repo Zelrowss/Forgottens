@@ -16,8 +16,10 @@ public class DamagePopup : MonoBehaviour
         textMesh = GetComponent<TextMeshPro>();
     }
 
-    public static DamagePopup Create(GameObject Object, Vector3 position, Quaternion rotation, float damageAmount, float criticalMultiplier){
+    public static DamagePopup Create(GameObject Object, Vector3 position, Quaternion rotation, float damageAmount, float criticalMultiplier, Canvas playerCanvas){       
         GameObject damagePopupGO = Instantiate(Object, position, rotation);
+        damagePopupGO.transform.parent = playerCanvas.transform;
+        
 
         DamagePopup damagePopup = damagePopupGO.GetComponent<DamagePopup>();
         damagePopup.Setup(damageAmount, criticalMultiplier);

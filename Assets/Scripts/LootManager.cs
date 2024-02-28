@@ -7,7 +7,7 @@ public class LootManager : ScriptableObject
 {
 
     public GameObject model;
-    public float value;
+    public int value;
 
     public void OnTriggerEnter(Collider other) {
         if (model.CompareTag("HealthBall")) {
@@ -43,14 +43,15 @@ public class LootManager : ScriptableObject
         else if (model.CompareTag("Ammo1")) {
             if (other.gameObject.CompareTag("Player")) {
                 PlayerManager playerManager = other.gameObject.GetComponentInParent<PlayerManager>();
+                WeaponsManager weaponsManager = playerManager.firstWeaponObject.GetComponent<WeaponsManager>();
                 
-                if (playerManager.firstMunition >= playerManager.maxFirstMunition) return;
+                if (weaponsManager.totalAmmo >= playerManager.maxFirstMunition) return;
 
-                if (playerManager.firstMunition + value > playerManager.maxFirstMunition) {
-                    playerManager.firstMunition = playerManager.maxFirstMunition;
+                if (weaponsManager.totalAmmo + value > playerManager.maxFirstMunition) {
+                    weaponsManager.totalAmmo = playerManager.maxFirstMunition;
                 }
                 else{
-                    playerManager.firstMunition += value;
+                    weaponsManager.totalAmmo += value;
                 }
                 Destroy(this);
             }
@@ -58,29 +59,15 @@ public class LootManager : ScriptableObject
         else if (model.CompareTag("Ammo2")) {
             if (other.gameObject.CompareTag("Player")) {
                 PlayerManager playerManager = other.gameObject.GetComponentInParent<PlayerManager>();
+                WeaponsManager weaponsManager = playerManager.secondWeaponObject.GetComponent<WeaponsManager>();
                 
-                if (playerManager.secondMunition >= playerManager.maxSecondMunition) return;
+                if (weaponsManager.totalAmmo >= playerManager.maxFirstMunition) return;
 
-                if (playerManager.secondMunition + value > playerManager.maxSecondMunition) {
-                    playerManager.secondMunition = playerManager.maxSecondMunition;
+                if (weaponsManager.totalAmmo + value > playerManager.maxFirstMunition) {
+                    weaponsManager.totalAmmo = playerManager.maxFirstMunition;
                 }
                 else{
-                    playerManager.secondMunition += value;
-                }
-                Destroy(this);
-            }
-        }
-        else if (model.CompareTag("Ammo3")) {
-            if (other.gameObject.CompareTag("Player")) {
-                PlayerManager playerManager = other.gameObject.GetComponentInParent<PlayerManager>();
-                
-                if (playerManager.thirdMunition >= playerManager.maxThirdMunition) return;
-
-                if (playerManager.thirdMunition + value > playerManager.maxThirdMunition) {
-                    playerManager.thirdMunition = playerManager.maxThirdMunition;
-                }
-                else{
-                    playerManager.thirdMunition += value;
+                    weaponsManager.totalAmmo += value;
                 }
                 Destroy(this);
             }

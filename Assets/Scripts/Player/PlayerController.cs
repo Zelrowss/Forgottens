@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
     public bool isCrouching = false;
     public bool isSprinting = false;
     public bool isJumping = false;
+    public bool isDoubleJumping = false;
     public bool isSliding = false;
     public bool isRolling = false;
     public bool isDashing = false;
@@ -53,11 +54,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float currentSlidingTime;
 
     [Header("Jump & Wall Jump")]
-    private float verticalVelocity;
     public float jumpCounter;
-    private RaycastHit forwardHit;
     public bool canWallJump = false;
     public bool needToWaitWallJump = false;
+    private float verticalVelocity;
+    private RaycastHit forwardHit;
 
     [Header("Rolling")]    
     private Vector3 rollDestination;
@@ -90,7 +91,7 @@ public class PlayerController : MonoBehaviour
     private RaycastHit rightWallHit;
     public bool wallLeft;
     public bool wallRight;
-    private bool canWallRun = false;
+    public bool canWallRun = false;
 
 
     Vector3 rayOrigin;
@@ -131,6 +132,8 @@ public class PlayerController : MonoBehaviour
         playerInputActions.Player.MeleeAttack.performed += OnMeleeAttack;
         playerInputActions.Player.MeleeAttack.performed += OnMeleeAttackCanceled;
 
+        playerInputActions.Player.Reload.performed += OnReload;
+
         playerInputActions.Enable();
     }
 
@@ -166,6 +169,11 @@ public class PlayerController : MonoBehaviour
         }
         else if(canWallRun){
             isWallRunning = !isWallRunning;
+        }
+        else if (jumpCounter < 2 && !canWallRun) {
+            isDoubleJumping = true;
+            jumpCounter++;
+            verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);   
         }
     }
 
@@ -224,7 +232,7 @@ public class PlayerController : MonoBehaviour
             hasRolled = true;
             canDash = false;
 
-            rollDestination = transform.position + _armature.transform.forward * currentSpeed;
+            rollDestination = transform.position + _armature.transform.forward * 25;
 
             Invoke("WaitForRollReset", 1f);
         }
@@ -330,6 +338,10 @@ public class PlayerController : MonoBehaviour
         if (isWallRunning) currentSpeed = wallRunSpeed;
 
         return currentSpeed;
+    }
+    
+    private void OnReload(InputAction.CallbackContext context){
+        _playerManager.currentWeapon.GetComponent<WeaponsManager>().Reload();
     }
 
     private void Update()
@@ -437,6 +449,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate(){
         if (controller.isGrounded && isJumping && verticalVelocity <= 0) isJumping = false;
+        if (controller.isGrounded && isDoubleJumping && verticalVelocity <= 0) isDoubleJumping = false;
         if (controller.isGrounded && isJumping && hasRolled) hasRolled = false;
         if (controller.isGrounded && jumpCounter > 0 && verticalVelocity <= 0) jumpCounter = 0;
         if (controller.isGrounded && specialAttack) specialAttack = false;

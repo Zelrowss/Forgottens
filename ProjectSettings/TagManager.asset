@@ -14,6 +14,16 @@ TagManager:
   - Ammo1
   - Ammo2
   - Ammo3
+  - Aurorium
+  - Iridium
+  - Biollumina
+  - Aurique
+  - Adamantite
+  - Prismatite
+  - Ether
+  - Arcanite
+  - "X\xE9nium"
+  - "S\xE9l\xE9nium"
   layers:
   - Default
   - TransparentFX

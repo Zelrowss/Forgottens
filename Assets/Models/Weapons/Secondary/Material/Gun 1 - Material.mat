@@ -207,7 +207,7 @@ Material:
     - _Anisotropy: 0
     - _BlendMode: 0
     - _BumpScale: 1
-    - _ClippingValue: 1
+    - _ClippingValue: 8.49495e-11
     - _CoatMask: 0
     - _ConservativeDepthOffsetEnable: 0
     - _CullMode: 2

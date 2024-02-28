@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public enum Weapons{
     Primary,
@@ -39,8 +40,7 @@ public class PlayerManager : MonoBehaviour
     [HideInInspector] public bool weaponChanging;
     public float maxHealth, maxShield, maxEnergy;
     public float health, shield, energy;
-    public float maxFirstMunition, maxSecondMunition, maxThirdMunition;
-    public float firstMunition, secondMunition, thirdMunition;
+    public int maxFirstMunition, maxSecondMunition, maxThirdMunition;
     public List<MarkerInfo> markers;
     
     [Header("Weapons")]
@@ -52,6 +52,13 @@ public class PlayerManager : MonoBehaviour
 
     [Header("Missions")]
     public GameObject objectif;
+    [Header("HUD")]
+    public Image healthBar;
+    public TextMeshProUGUI healthText;
+    public Image shieldBar;
+    public TextMeshProUGUI shieldtext;
+    public Image muntionBar;
+    public TextMeshProUGUI munitionAmount;
 
     // Actualise le rigg du personne (<!> très couteux en ressource <!>)
     public IEnumerator ReBuildRig(){
@@ -213,9 +220,6 @@ public class PlayerManager : MonoBehaviour
 
         health = maxHealth;
         shield = maxShield;
-        firstMunition = maxFirstMunition;
-        secondMunition = maxSecondMunition;
-        thirdMunition = maxThirdMunition;
 
         markers = new List<MarkerInfo>();
         MissionController missionManager = GameObject.FindGameObjectWithTag("Mission Manager").GetComponent<MissionController>();
@@ -281,6 +285,17 @@ public class PlayerManager : MonoBehaviour
             ChangeWeaponsClipping(currentWeapon, 1, true);
             StartCoroutine(WaitForNewWeapon());
         }
+
+        healthBar.fillAmount = health / maxHealth;
+        shieldBar.fillAmount = shield / maxShield;
+
+        healthText.text = Mathf.Floor(health).ToString();
+        shieldtext.text = Mathf.Floor(shield).ToString();
+
+        WeaponsManager weaponsManager = currentWeapon.GetComponent<WeaponsManager>();
+
+        muntionBar.fillAmount = (float)weaponsManager.currentAmmoInClip / (float)weaponsManager.maxAmmoPerClip;
+        munitionAmount.text = weaponsManager.currentAmmoInClip.ToString() + "/" + weaponsManager.totalAmmo.ToString();
     }
 
     void LateUpdate()

@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum Weapons{
     Primary,
@@ -15,6 +18,8 @@ public class PlayerManager : MonoBehaviour
     public GameObject _firstWeapon;
     public GameObject _secondWeapon;
     public GameObject _meleeWeapon;
+    public MenuEchap menuEchap;
+    private PlayerController _playerController;
 
     [Header("Player")]
     public bool isInMission = false;
@@ -74,6 +79,12 @@ public class PlayerManager : MonoBehaviour
         }
 
         StartCoroutine(ReBuildRig());
+
+        // Initialisation de la touche Echap pour son Menu
+        _playerController = GetComponent<PlayerController>();
+        _playerController.playerInputActions = new PlayerInputActions();
+        _playerController.playerInputActions.Player.MenuEchap.performed += OpenCloseMenuEchap;
+        _playerController.playerInputActions.Enable();
     }
 
     public IEnumerator ReBuildRig(){
@@ -112,5 +123,45 @@ public class PlayerManager : MonoBehaviour
             materials.sharedMaterial.SetFloat("_ClippingValue", lerp ? Mathf.Lerp(materials.sharedMaterial.GetFloat("_ClippingValue"), value, 0.19f) : value);
         }
 
+    }
+
+    private void OpenCloseMenuEchap(InputAction.CallbackContext context)
+    {
+        if (menuEchap.blocageDesBoutons == false)
+        {
+            if (menuEchap.options.commandes.textConfirmer.color == menuEchap.pasCliquable &&
+                menuEchap.affichage.textConfirmer.color == menuEchap.pasCliquable)
+            {
+                ExecutionToucheEchap();
+            }
+
+            else
+            {
+                if (menuEchap.options.commandes.textConfirmer.color == menuEchap.gris)
+                {
+                    menuEchap.blocageDesBoutons = true;
+                    menuEchap.options.commandes.panelModification.SetActive(true);
+                    menuEchap.options.commandes.enregistrementDuClic = "Bouton Echap";
+                }
+                else if (menuEchap.affichage.textConfirmer.color == menuEchap.gris)
+                {
+                    menuEchap.blocageDesBoutons = true;
+                    menuEchap.affichage.panelConfirmation.SetActive(true);
+                    menuEchap.affichage.enregistrementDuClic = "Bouton Echap";
+                }
+            }
+        }
+    }
+
+    public void ExecutionToucheEchap()
+    {
+        if (menuEchap.gameObject.activeSelf == false)
+        {
+            menuEchap.OpenMenuEchap();
+        }
+        else
+        {
+            menuEchap.CloseMenuEchap();
+        }
     }
 }

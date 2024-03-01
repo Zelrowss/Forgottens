@@ -116,6 +116,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Menu Echap"",
+                    ""type"": ""Button"",
+                    ""id"": ""2a7e9519-0899-4176-ac67-96e166eaea9c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -272,6 +281,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Melee Attack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5c732d11-749a-4249-8239-762d5b8566ca"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Menu Echap"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -280,7 +300,18 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         {
             ""name"": ""Keyboard"",
             ""bindingGroup"": ""Keyboard"",
-            ""devices"": []
+            ""devices"": [
+                {
+                    ""devicePath"": ""<Keyboard>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                },
+                {
+                    ""devicePath"": ""<Mouse>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                }
+            ]
         }
     ]
 }");
@@ -296,6 +327,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_SpecialFire = m_Player.FindAction("Special Fire", throwIfNotFound: true);
         m_Player_WeaponChange = m_Player.FindAction("Weapon Change", throwIfNotFound: true);
         m_Player_MeleeAttack = m_Player.FindAction("Melee Attack", throwIfNotFound: true);
+        m_Player_MenuEchap = m_Player.FindAction("Menu Echap", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -367,6 +399,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_SpecialFire;
     private readonly InputAction m_Player_WeaponChange;
     private readonly InputAction m_Player_MeleeAttack;
+    private readonly InputAction m_Player_MenuEchap;
     public struct PlayerActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -381,6 +414,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @SpecialFire => m_Wrapper.m_Player_SpecialFire;
         public InputAction @WeaponChange => m_Wrapper.m_Player_WeaponChange;
         public InputAction @MeleeAttack => m_Wrapper.m_Player_MeleeAttack;
+        public InputAction @MenuEchap => m_Wrapper.m_Player_MenuEchap;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -420,6 +454,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @MeleeAttack.started += instance.OnMeleeAttack;
             @MeleeAttack.performed += instance.OnMeleeAttack;
             @MeleeAttack.canceled += instance.OnMeleeAttack;
+            @MenuEchap.started += instance.OnMenuEchap;
+            @MenuEchap.performed += instance.OnMenuEchap;
+            @MenuEchap.canceled += instance.OnMenuEchap;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -454,6 +491,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @MeleeAttack.started -= instance.OnMeleeAttack;
             @MeleeAttack.performed -= instance.OnMeleeAttack;
             @MeleeAttack.canceled -= instance.OnMeleeAttack;
+            @MenuEchap.started -= instance.OnMenuEchap;
+            @MenuEchap.performed -= instance.OnMenuEchap;
+            @MenuEchap.canceled -= instance.OnMenuEchap;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -492,5 +532,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnSpecialFire(InputAction.CallbackContext context);
         void OnWeaponChange(InputAction.CallbackContext context);
         void OnMeleeAttack(InputAction.CallbackContext context);
+        void OnMenuEchap(InputAction.CallbackContext context);
     }
 }

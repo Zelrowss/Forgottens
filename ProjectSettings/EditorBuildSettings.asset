@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: "Assets/Scenes/Sc\xE8nes test/MenuEchap.unity"
+    guid: 0d553b4d76afadb4389e5886af0688fc
   m_configObjects: {}

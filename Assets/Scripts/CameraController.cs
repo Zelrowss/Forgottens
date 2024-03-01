@@ -20,7 +20,7 @@ public class CameraController : MonoBehaviour
     private float currentHorizontalAngle = 0f;
     public float normalSensitivity = 100;
     public float aimSensitivity = 100;
-    private float targetFOV, baseFOV;
+    public float targetFOV, baseFOV;
 
     private void Awake(){
         _playerController = GetComponentInParent<PlayerController>();
@@ -49,7 +49,7 @@ public class CameraController : MonoBehaviour
         Vector2 mouseInput = context.ReadValue<Vector2>();
         
         currentHorizontalAngle += mouseInput.x * Time.deltaTime * (_playerController.isAiming ? aimSensitivity : normalSensitivity);
-        currentVerticalAngle += mouseInput.y * Time.deltaTime * (_playerController.isAiming ? aimSensitivity : normalSensitivity);
+        currentVerticalAngle -= mouseInput.y * Time.deltaTime * (_playerController.isAiming ? aimSensitivity : normalSensitivity);
         currentVerticalAngle = Mathf.Clamp(currentVerticalAngle, -80, 80);
 
         transform.localRotation = Quaternion.Euler(currentVerticalAngle, currentHorizontalAngle, 0f);

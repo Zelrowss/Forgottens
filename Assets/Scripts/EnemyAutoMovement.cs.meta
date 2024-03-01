@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/DestroyableObjects.cs.meta
+guid: 29d434a53dd2bbf4fb8522209389ebf4
+========
+guid: f48acafef220b6b4f8a11a706cd2ab71
+>>>>>>>> enemy-IA:Assets/Scripts/EnemyAutoMovement.cs.meta
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

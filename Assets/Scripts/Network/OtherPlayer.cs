@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class OtherPlayer : MonoBehaviour
 {
-    public GameObject UserNameRotation; //Le GameObject qui comporte le pseudo
-    public TMP_Text UserNameTag; //Le pseudo affiché
+    public GameObject UserNameRotation; //Comporte le pseudo pour la rotation
+    public TMP_Text UserNameTag; //Pseudo de ce joueur
     public Animator animator;
-    Transform player; //Player
-    public PlayerNetManager actualPlayer;
-    public GameObject PlayerSkin;
+    Transform player; //Player Local
+    public PlayerNetManager actualPlayer; //Informations de ce player
+    public GameObject PlayerSkin; //Skin de ce player
 
     Vector3 LastEuler;
     Vector3 OldPos;
@@ -22,6 +22,10 @@ public class OtherPlayer : MonoBehaviour
 
     private void Update()
     {
+
+        //  Check de distance entre le local Player et ce player
+        //  pour activer ou désactiver son skin ou son pseudo.
+        //  Permet aussi d'afficher le UserName et l'orienté
         if (player != null && actualPlayer != null)
         {
             float dist = Vector3.Distance(player.position, transform.position);
@@ -42,6 +46,10 @@ public class OtherPlayer : MonoBehaviour
 
 
 
+
+        //  Regarde le déplacement d'un joueur avec sa vitesse
+        //  pour le convertir en float pour l'animation qui
+        //  convient avec la bonne vitesse
         if (animator != null)
         {
             Vector3 deltaPos = OldPos - transform.position;
@@ -56,9 +64,9 @@ public class OtherPlayer : MonoBehaviour
             var angle = transform.eulerAngles.y - LastEuler.y;
             if (angle > 180) angle -= 360;
             if (angle < -180) angle += 360;
-            LastEuler = transform.eulerAngles;
             angle /= -Time.deltaTime * 40;
             animator.SetFloat("Horizontal", -angle);
+            LastEuler = transform.eulerAngles;
         }
     }
 }

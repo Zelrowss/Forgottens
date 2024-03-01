@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 [System.Serializable]
@@ -61,6 +63,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        CantMove();
         if (_weaponManager == null) _weaponManager = GameObject.FindObjectOfType<WeaponsManager>();
 
         if (health <= 0 && shield <= 0){
@@ -221,5 +224,69 @@ public class Enemy : MonoBehaviour
 
         if (gameobjectComponent.shield > 0) gameobjectComponent.shield -= damageAmout / 2;
         else gameobjectComponent.health -= damageAmout / 2;
+    }
+
+    void CantMove()
+    {
+        if(cantMove == true)
+        {
+            GetComponent<Animator>().enabled = false;
+            GetComponent<NavMeshAgent>().speed = 0;
+        }
+        else if(cantMove == false)
+        {
+            GetComponent<Animator>().enabled = true;
+            GetComponent<NavMeshAgent>().speed = 3;
+        }
+    }
+}
+
+
+
+
+public class SaveClass : MonoBehaviour
+{
+    JsonSave jSave = new JsonSave();
+    PlayerLevel plvl = new PlayerLevel();
+    string SavePath = $"/../Save/NameFile.json";
+    string SaveContents;
+
+    public void Load()
+    {
+        SaveContents = File.ReadAllText(Application.dataPath + SavePath);
+        JsonSave loadSave = JsonUtility.FromJson<JsonSave>(SaveContents);
+        int v1 = loadSave.Value1;
+    }
+
+    public void Save()
+    {
+        jSave.Value1 = 1;
+        SaveContents = JsonUtility.ToJson(jSave, true);
+        File.WriteAllText(Application.dataPath + SavePath, SaveContents);
+    }
+
+    public void SavePlayer(int lvl, int exp)
+    {
+
+        plvl.level = lvl;
+        plvl.exp = exp;
+
+
+        File.WriteAllText(Application.dataPath + SavePath, exp.ToString());
+    }
+
+    [System.Serializable]
+    private class PlayerLevel
+    {
+        public int level;
+        public int exp;
+    }
+
+
+
+    [System.Serializable]
+    private class JsonSave
+    {
+        public int Value1;
     }
 }
